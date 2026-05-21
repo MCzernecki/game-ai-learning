@@ -52,6 +52,27 @@ class SnakeEnv:
             "danger": danger
         }
 
+    def get_q_state(self):
+        state = self.get_state()
+
+        head_x = state["head_x"]
+        head_y = state["head_y"]
+        food_x = state["food_x"]
+        food_y = state["food_y"]
+        danger = state["danger"]
+
+        return (
+            danger[ACTION_UP],
+            danger[ACTION_DOWN],
+            danger[ACTION_LEFT],
+            danger[ACTION_RIGHT],
+
+            food_y < head_y,
+            food_y > head_y,
+            food_x < head_x,
+            food_x > head_x
+        )
+
     def step(self, action):
         if self.done:
             return self.get_state(), 0, self.done, {
@@ -59,10 +80,17 @@ class SnakeEnv:
             }
         self.snake.set_direction_by_action(action)
 
+        old_distance = abs(self.snake.body[0][0] - self.food.position[0]) + abs(self.snake.body[0][1] - self.food.position[1])
+
         grow = self.snake.get_next_head() == self.food.position
         self.snake.move(grow)
+        new_distance = abs(self.snake.body[0][0] - self.food.position[0]) + abs(self.snake.body[0][1] - self.food.position[1])
         self.moves_without_food += 1
         reward = 0
+        if new_distance < old_distance:
+            reward += 0.2
+        else:
+            reward -= 0.2
 
         if grow:
             self.score += 1
