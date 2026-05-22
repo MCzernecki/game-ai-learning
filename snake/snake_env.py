@@ -73,6 +73,20 @@ class SnakeEnv:
             food_x > head_x
         )
 
+    def get_dqn_state(self):
+        state = self.get_q_state()
+
+        return [
+            int(state[0]),
+            int(state[1]),
+            int(state[2]),
+            int(state[3]),
+            int(state[4]),
+            int(state[5]),
+            int(state[6]),
+            int(state[7])
+        ]
+
     def step(self, action):
         if self.done:
             return self.get_state(), 0, self.done, {
